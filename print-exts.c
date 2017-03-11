@@ -28,6 +28,8 @@ static struct {
 } ignore;
 
 static int debug, recursive;
+
+static int ret;
 static unsigned int depth;
 
 /* Returns true if x is '.' or '..' */
@@ -145,14 +147,16 @@ static void scan_dir(const char *path, int fd)
 		fprintf(stderr,
 			"Unable to open handle for '%s': %s\n",
 			path, strerror(errno));
-		exit(1);
+		ret = 1;
+		return;
 	}
 	dh = fdopendir(fd);
 	if (!dh) {
 		fprintf(stderr,
 			"Unable to open directory '%s': %s\n",
 			path, strerror(errno));
-		exit(1);
+		ret = 1;
+		return;
 	}
 	depth++;
 
@@ -166,6 +170,7 @@ static void scan_dir(const char *path, int fd)
 			fprintf(stderr,
 				"Unable to stat '%s': %s\n",
 				dirent->d_name, strerror(errno));
+			ret = 1;
 			continue;
 		}
 		if (S_ISREG(stbuf.st_mode)) {
@@ -269,5 +274,5 @@ int main(int argc, char *argv[])
 	else for (i = optind; i < argc; i++)
 		scan_dir(argv[i], AT_FDCWD);
 	print_result(reverse);
-	return 0;
+	return ret;
 }
