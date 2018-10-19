@@ -11,6 +11,11 @@ compiler:
   - clang
   - gcc
 
+addons:
+  artifacts:
+    paths:
+      - bin
+
 matrix:
   include:
     # works on Precise and Trusty
